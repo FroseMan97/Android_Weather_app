@@ -1,4 +1,4 @@
-package com.iazarevsergey.lessons.di
+package com.iazarevsergey.lessons
 
 import android.app.Activity
 import android.app.Application

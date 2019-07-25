@@ -17,7 +17,10 @@ import com.mancj.materialsearchbar.MaterialSearchBar
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjection
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
 import kotlinx.android.synthetic.main.activity_weather.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -42,20 +45,29 @@ class WeatherActivity : AppCompatActivity() {
     }
 
     private fun initSearchBarListeners() {
-        searchBar.addTextChangeListener(object : TextWatcher {
-            private var searchFor = ""
-            override fun afterTextChanged(p0: Editable?) {
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
-
-            override fun onTextChanged(string: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (currentFocus == searchBar.searchEditText) {
-                    weatherViewModel.onTextChanged(string.toString())
+        Observable.create(ObservableOnSubscribe<String> { subscriber ->
+            searchBar.addTextChangeListener(object : TextWatcher {
+                private var searchFor = ""
+                override fun afterTextChanged(p0: Editable?) {
                 }
-            }
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(string: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (currentFocus == searchBar.searchEditText) {
+                        subscriber.onNext(string.toString())
+                    }
+                }
+            })
         })
+            .map { text -> text.toLowerCase().trim() }
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .distinct()
+            .filter { text -> text.isNotBlank() }
+            .subscribe { text ->
+                weatherViewModel.onTextChanged(text)
+            }
 
         searchBar.setSuggestionsClickListener(object : SuggestionsAdapter.OnItemViewClickListener {
             override fun OnItemDeleteListener(position: Int, v: View?) {

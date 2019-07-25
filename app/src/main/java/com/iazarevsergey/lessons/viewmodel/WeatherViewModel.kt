@@ -3,13 +3,20 @@ package com.iazarevsergey.lessons.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.iazarevsergey.lessons.data.repository.WeatherRepository
 import com.iazarevsergey.lessons.domain.model.CurrentWeather
+import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
+import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
+import io.reactivex.android.schedulers.AndroidSchedulers
+
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class WeatherViewModel @Inject constructor(private val weatherRepository: WeatherRepository) : ViewModel() {
+class WeatherViewModel @Inject constructor(
+    private val getWeatherUsecase: GetWeatherUsecase,
+    private val getSearchUsecase: GetSearchUsecase
+) : ViewModel() {
 
     private var currentWeather = MutableLiveData<CurrentWeather>()
     private var isLoading = MutableLiveData<Boolean>()
@@ -23,26 +30,48 @@ class WeatherViewModel @Inject constructor(private val weatherRepository: Weathe
     fun getSearches(): LiveData<List<String>> = searches
 
 
-    fun onSearchConfirmed(location: String) {
-        if (!location.isNullOrEmpty()) {
+    fun onSearchConfirmed(weatherLocation: String) {
+        if (!weatherLocation.isNullOrEmpty()) {
             compositeDisposable.add(
-                weatherRepository.getCurrentWeather(location)
-                    .doOnSubscribe { isLoading.postValue(true) }
+                getWeatherUsecase.execute(weatherLocation)
                     .subscribeOn(Schedulers.io())
-                    .subscribe(
-                        { currentWeather.postValue(it);isLoading.postValue(false) },
-                        { onError.postValue(it.message);isLoading.postValue(false) })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { handleGetWeatherResult(it) }
             )
         }
     }
 
-    fun onTextChanged(location: String) {
-        if (!location.isNullOrEmpty()) {
+    fun onTextChanged(searchLocation: String) {
+        if (!searchLocation.isNullOrEmpty()) {
             compositeDisposable.add(
-                weatherRepository.getSearches(location)
+                getSearchUsecase.execute(searchLocation)
                     .subscribeOn(Schedulers.io())
-                    .subscribe({ searches.postValue(it.map { it.name }) }, { onError.postValue(it.message) })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe{ handleGetSearchesResult(it)}
             )
+        }
+    }
+
+    private fun handleGetWeatherResult(result: GetWeatherUsecase.Result) {
+        isLoading.postValue(result == GetWeatherUsecase.Result.Loading)
+        when (result) {
+            is GetWeatherUsecase.Result.Success -> {
+                currentWeather.postValue(result.weather)
+            }
+            is GetWeatherUsecase.Result.Failure -> {
+                onError.postValue(result.throwable.message)
+            }
+        }
+    }
+
+    private fun handleGetSearchesResult(result: GetSearchUsecase.Result) {
+        when (result) {
+            is GetSearchUsecase.Result.Success -> {
+                searches.postValue(result.searches.map{it.name})
+            }
+            is GetSearchUsecase.Result.Failure -> {
+                onError.postValue(result.throwable.message)
+            }
         }
     }
 

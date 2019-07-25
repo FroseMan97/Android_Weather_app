@@ -1,7 +1,7 @@
 package com.iazarevsergey.lessons.di.component
 
 import android.app.Application
-import com.iazarevsergey.lessons.di.WeatherApplication
+import com.iazarevsergey.lessons.WeatherApplication
 import com.iazarevsergey.lessons.di.module.ActivityModule
 import com.iazarevsergey.lessons.di.module.DataModule
 import com.iazarevsergey.lessons.di.module.FragmentModule

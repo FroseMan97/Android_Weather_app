@@ -1,12 +1,15 @@
 package com.iazarevsergey.lessons.di.module
 
-import com.iazarevsergey.lessons.data.network.ApiService
+import com.iazarevsergey.lessons.AppConstants.Companion.WEATHER_BASE_URL
+import com.iazarevsergey.lessons.data.network.IWeatherEndpoint
+import com.iazarevsergey.lessons.data.network.WeatherApi
 import com.iazarevsergey.lessons.data.network.RequestInterceptor
 import com.iazarevsergey.lessons.data.repository.WeatherRepository
 import com.iazarevsergey.lessons.domain.repository.IWeatherRepository
+import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
+import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
 import dagger.Module
 import dagger.Provides
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -17,24 +20,35 @@ import javax.inject.Singleton
 @Module
 class DataModule {
 
-    val BASE_URL = "http://api.apixu.com/v1/"
 
     @Provides
     @Singleton
-    fun provideRequestInterceptor():RequestInterceptor{
-        return RequestInterceptor()
+    fun provdeGetWeatherUsecase(weatherRepository: WeatherRepository):GetWeatherUsecase{
+        return GetWeatherUsecase(weatherRepository)
     }
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(apiService: ApiService): IWeatherRepository {
-        return WeatherRepository(apiService)
+    fun provdeGetSearchUsecase(weatherRepository: WeatherRepository): GetSearchUsecase {
+        return GetSearchUsecase(weatherRepository)
     }
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
+    fun provideWeatherRepository(weatherApi: WeatherApi): IWeatherRepository {
+        return WeatherRepository(weatherApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherApi(weatherEndpoint: IWeatherEndpoint): WeatherApi{
+        return WeatherApi(weatherEndpoint)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherEndpoint(retrofit: Retrofit): IWeatherEndpoint {
+        return retrofit.create(IWeatherEndpoint::class.java)
     }
 
     @Provides
@@ -42,7 +56,7 @@ class DataModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(BASE_URL)
+            .baseUrl(WEATHER_BASE_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -56,5 +70,11 @@ class DataModule {
             .connectTimeout(1, TimeUnit.MINUTES)
             .readTimeout(1, TimeUnit.MINUTES)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRequestInterceptor():RequestInterceptor{
+        return RequestInterceptor()
     }
 }
