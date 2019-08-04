@@ -1,67 +1,71 @@
 package com.iazarevsergey.lessons.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.iazarevsergey.lessons.domain.model.CurrentWeather
 import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
 import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
-import io.reactivex.android.schedulers.AndroidSchedulers
-
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class WeatherViewModel @Inject constructor(
+class ListWeathersViewModel @Inject constructor(
     private val getWeatherUsecase: GetWeatherUsecase,
     private val getSearchUsecase: GetSearchUsecase
-) : ViewModel() {
+) : ViewModel(){
 
-    private var currentWeather = MutableLiveData<CurrentWeather>()
-    private var isLoading = MutableLiveData<Boolean>()
+    private val weathers = MutableLiveData<List<CurrentWeather>>()
     private var onError = MutableLiveData<String>()
     private var searches = MutableLiveData<List<String>>()
     private val compositeDisposable = CompositeDisposable()
 
-    fun getWeather(): LiveData<CurrentWeather> = currentWeather
-    fun getIsLoading(): LiveData<Boolean> = isLoading
+    init {
+        weathers.value=ArrayList()
+    }
+
+    fun getWeathers(): LiveData<List<CurrentWeather>> = weathers
     fun getOnError(): LiveData<String> = onError
-    fun getSearches(): LiveData<List<String>> = searches
 
-
-    fun onSearchConfirmed(weatherLocation: String) {
+    fun addNewLocation(weatherLocation:String){
         if (!weatherLocation.isNullOrEmpty()) {
             compositeDisposable.add(
                 getWeatherUsecase.execute(weatherLocation)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { handleGetWeatherResult(it) }
             )
         }
     }
+
+
+    private fun handleGetWeatherResult(result: GetWeatherUsecase.Result) {
+        when (result) {
+            is GetWeatherUsecase.Result.Success -> {
+                val arrayList = ArrayList(weathers.value!!)
+                arrayList.add(result.weather)
+                weathers.postValue(arrayList)
+            }
+            is GetWeatherUsecase.Result.Failure -> {
+                onError.postValue(result.throwable.message)
+            }
+        }
+    }
+
+    fun getSearches(): LiveData<List<String>> = searches
 
     fun onTextChanged(searchLocation: String) {
         if (!searchLocation.isNullOrEmpty()) {
             compositeDisposable.add(
                 getSearchUsecase.execute(searchLocation)
                     .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe{ handleGetSearchesResult(it)}
             )
         }
     }
 
-    private fun handleGetWeatherResult(result: GetWeatherUsecase.Result) {
-        isLoading.postValue(result == GetWeatherUsecase.Result.Loading)
-        when (result) {
-            is GetWeatherUsecase.Result.Success -> {
-                currentWeather.postValue(result.weather)
-            }
-            is GetWeatherUsecase.Result.Failure -> {
-                onError.postValue(result.throwable.message)
-            }
-        }
+    fun getWeatherByPosition(position:Int): CurrentWeather{
+        return weathers.value?.get(position)!!
     }
 
     private fun handleGetSearchesResult(result: GetSearchUsecase.Result) {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Погода</string>
+    <string name="enter_location">Введите локацию</string>
+    <string name="city_text">Город</string>
+    <string name="temp_text">Температура</string>
+    <string name="condition_text">Погодные условия</string>
+    <string name="last_update_text">Последнее обновление</string>
+    <string name="region_text">Регион, страна</string>
+    <string name="feelslike_text">Ощущается как</string>
+    <string name="wind_text">Скорость ветра</string>
+    <string name="weatherIcon_text">Иконка погодных условий</string>
+    <string name="speed_units_text">км/ч</string>
+    <string name="fragment_list_weathers">Список локаций</string>
+    <string name="fragment_detail_weather">Детальная информация о погоде</string>
+</resources>

@@ -1,7 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Weather</string>
+    <string name="app_name">Weather app</string>
+    <string name="enter_location">Enter location</string>
+    <string name="city_text">City</string>
+    <string name="temp_text">Temperature</string>
+    <string name="condition_text">Condition text</string>
+    <string name="last_update_text">Last update</string>
+    <string name="region_text">Region</string>
+    <string name="feelslike_text">Feels like</string>
+    <string name="wind_text">Wind speed</string>
+    <string name="weatherIcon_text">Condition icon</string>
+    <string name="speed_units_text">km/h</string>
+    <string name="fragment_list_weathers">List of the locations</string>
+    <string name="fragment_detail_weather">Detail weather</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_main">MainActivity</string>
 </resources>

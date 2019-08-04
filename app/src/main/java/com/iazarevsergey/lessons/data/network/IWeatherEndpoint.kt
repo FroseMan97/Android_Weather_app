@@ -13,13 +13,13 @@ interface IWeatherEndpoint {
     @GET("current.json")
     fun getCurrentWeather(
         @Query("q") location: String,
-        @Query("lang") language: String = "ru"
+        @Query("lang") language: String = "en"
     ): Single<CurrentWeatherResponse>
 
 
     @GET("search.json")
     fun getSearches(
         @Query("q") location: String,
-        @Query("lang") language: String = "ru"
+        @Query("lang") language: String = "en"
     ): Single<List<SearchResponse>>
 }

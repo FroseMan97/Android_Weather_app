@@ -1,6 +1,6 @@
 package com.iazarevsergey.lessons.di.module
 
-import com.iazarevsergey.lessons.ui.WeatherActivity
+import com.iazarevsergey.lessons.ui.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -8,6 +8,6 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityModule {
 
     @ContributesAndroidInjector(modules = [FragmentModule::class])
-    abstract fun contributeWeatherActivity(): WeatherActivity
+    abstract fun contributeMainActivity(): MainActivity
 
 }

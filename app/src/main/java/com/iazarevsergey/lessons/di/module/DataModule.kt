@@ -10,6 +10,7 @@ import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
 import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -19,7 +20,6 @@ import javax.inject.Singleton
 
 @Module
 class DataModule {
-
 
     @Provides
     @Singleton

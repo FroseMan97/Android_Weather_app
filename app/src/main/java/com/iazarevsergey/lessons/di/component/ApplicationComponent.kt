@@ -1,7 +1,7 @@
 package com.iazarevsergey.lessons.di.component
 
 import android.app.Application
-import com.iazarevsergey.lessons.WeatherApplication
+import com.iazarevsergey.lessons.App
 import com.iazarevsergey.lessons.di.module.ActivityModule
 import com.iazarevsergey.lessons.di.module.DataModule
 import com.iazarevsergey.lessons.di.module.FragmentModule
@@ -25,5 +25,5 @@ interface ApplicationComponent {
         fun build(): ApplicationComponent
     }
 
-    fun inject(application: WeatherApplication)
+    fun inject(application: App)
 }
