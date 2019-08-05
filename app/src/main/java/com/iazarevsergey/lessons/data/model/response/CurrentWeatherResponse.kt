@@ -21,7 +21,9 @@ data class CurrentWeatherResponse (
         current.condition.icon,
         location.name,
         location.region,
-        location.country
+        location.country,
+        location.lat,
+        location.lon
     )
 
 }

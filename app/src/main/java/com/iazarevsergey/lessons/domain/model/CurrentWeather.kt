@@ -9,5 +9,7 @@ data class CurrentWeather (
     val condition_icon : String,
     val location_name: String,
     val location_region: String,
-    val location_country: String
+    val location_country: String,
+    val location_lat:Double,
+    val location_lon:Double
 )

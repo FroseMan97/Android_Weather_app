@@ -1,5 +1,6 @@
 package com.iazarevsergey.lessons.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,8 @@ class DetailWeatherViewModel @Inject constructor(
     fun getIsLoading(): LiveData<Boolean> = isLoading
     fun getOnError(): LiveData<String> = onError
 
+
+
     fun getDetailWeather(weatherLocation: String) {
         if (!weatherLocation.isNullOrEmpty()) {
             compositeDisposable.add(
@@ -35,6 +38,7 @@ class DetailWeatherViewModel @Inject constructor(
         isLoading.postValue(result == GetWeatherUsecase.Result.Loading)
         when (result) {
             is GetWeatherUsecase.Result.Success -> {
+
                 currentWeather.postValue(result.weather)
             }
             is GetWeatherUsecase.Result.Failure -> {
@@ -44,6 +48,7 @@ class DetailWeatherViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+
         compositeDisposable.dispose()
         super.onCleared()
     }

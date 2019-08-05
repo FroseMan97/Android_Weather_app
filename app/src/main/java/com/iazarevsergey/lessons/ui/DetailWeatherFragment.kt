@@ -2,6 +2,7 @@ package com.iazarevsergey.lessons.ui
 
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,6 @@ import com.iazarevsergey.lessons.viewmodel.DetailWeatherViewModel
 import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_detail_weather.*
-import kotlinx.android.synthetic.main.fragment_list_weathers.*
 import javax.inject.Inject
 
 class DetailWeatherFragment : Fragment() {
@@ -29,10 +29,11 @@ class DetailWeatherFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         AndroidSupportInjection.inject(this)
         detailWeatherViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailWeatherViewModel::class.java)
-        detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation")!!)
+        if(detailWeatherViewModel.getWeather().value == null){
+            detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation")!!)
+        }
     }
 
     override fun onCreateView(

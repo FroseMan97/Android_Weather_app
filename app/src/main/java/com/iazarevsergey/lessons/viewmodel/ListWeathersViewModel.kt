@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.iazarevsergey.lessons.domain.model.CurrentWeather
+import com.iazarevsergey.lessons.domain.model.Search
 import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
 import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
 import io.reactivex.disposables.CompositeDisposable
@@ -18,11 +19,11 @@ class ListWeathersViewModel @Inject constructor(
 
     private val weathers = MutableLiveData<List<CurrentWeather>>()
     private var onError = MutableLiveData<String>()
-    private var searches = MutableLiveData<List<String>>()
+    private var searches = MutableLiveData<List<Search>>()
     private val compositeDisposable = CompositeDisposable()
 
     init {
-        weathers.value=ArrayList()
+        weathers.value=ArrayList<CurrentWeather>()
     }
 
     fun getWeathers(): LiveData<List<CurrentWeather>> = weathers
@@ -52,7 +53,7 @@ class ListWeathersViewModel @Inject constructor(
         }
     }
 
-    fun getSearches(): LiveData<List<String>> = searches
+    fun getSearches(): LiveData<List<Search>> = searches
 
     fun onTextChanged(searchLocation: String) {
         if (!searchLocation.isNullOrEmpty()) {
@@ -64,15 +65,16 @@ class ListWeathersViewModel @Inject constructor(
         }
     }
 
-    fun getFullWeatherRequestByPosition(position:Int): String{
+    fun getWeatherCoordinatesByPosition(position:Int): String{
         val weather = weathers.value?.get(position)!!
-        return weather.location_name+","+weather.location_region+","+weather.location_country
+        return "${weather.location_lat},${weather.location_lon}"
+
     }
 
     private fun handleGetSearchesResult(result: GetSearchUsecase.Result) {
         when (result) {
             is GetSearchUsecase.Result.Success -> {
-                searches.postValue(result.searches.map{it.name})
+                searches.postValue(result.searches)
             }
             is GetSearchUsecase.Result.Failure -> {
                 onError.postValue(result.throwable.message)
@@ -81,6 +83,7 @@ class ListWeathersViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        Log.d("sosat","list cleared")
         compositeDisposable.dispose()
         super.onCleared()
     }

@@ -8,5 +8,7 @@ data class LocationModel(
     @SerializedName("name") val name: String,
     @SerializedName("region") val region: String,
     @SerializedName("country") val country: String,
-    @SerializedName("localtime") val localtime: String
+    @SerializedName("localtime") val localtime: String,
+    @SerializedName("lon") val lon: Double,
+    @SerializedName("lat") val lat: Double
 )

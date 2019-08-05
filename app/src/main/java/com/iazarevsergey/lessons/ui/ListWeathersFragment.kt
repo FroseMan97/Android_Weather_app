@@ -1,7 +1,6 @@
 package com.iazarevsergey.lessons.ui
 
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,20 +18,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.iazarevsergey.lessons.R
+import com.iazarevsergey.lessons.domain.model.Search
 import com.iazarevsergey.lessons.factory.ViewModelFactory
+import com.iazarevsergey.lessons.ui.adapter.CustomSuggestionsAdapter
 import com.iazarevsergey.lessons.ui.adapter.WeatherAdapter
 import com.iazarevsergey.lessons.viewmodel.ListWeathersViewModel
 import com.mancj.materialsearchbar.MaterialSearchBar
-import com.mancj.materialsearchbar.adapter.SuggestionsAdapter
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import kotlinx.android.synthetic.main.fragment_list_weathers.*
-import java.lang.NullPointerException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
+class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener,
+    CustomSuggestionsAdapter.OnItemViewClickListener {
 
     @Inject
     internal lateinit var viewModelFactory: ViewModelFactory
@@ -54,9 +54,18 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolBar.setupWithNavController(findNavController())
+
+        val inflater = LayoutInflater.from(this.context)
+
+        val customSuggestionsAdapter = CustomSuggestionsAdapter(inflater, this)
+        searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         val adapter = WeatherAdapter(this)
         recyclerView.adapter = adapter
+
+        initSearchBarListeners()
 
         listWeathersViewModel.getWeathers().observe(this, Observer {
             if (it != null)
@@ -67,7 +76,6 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
             showError(it)
         })
 
-        initSearchBarListeners()
 
         listWeathersViewModel.getSearches().observe(this, Observer {
             if (searchBar.isSearchEnabled) {
@@ -86,10 +94,17 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
         Navigation.findNavController(searchBar)
             .navigate(
                 R.id.action_listWeathersFragment_to_detailWeatherFragment,
-                bundleOf("selectedLocation" to listWeathersViewModel.getFullWeatherRequestByPosition(position))
+                bundleOf("selectedLocation" to listWeathersViewModel.getWeatherCoordinatesByPosition(position))
             )
 
     }
+
+    override fun OnItemClickListener(position: Int) {
+        val temp = searchBar.lastSuggestions[position] as Search
+        searchBar.text = if (!temp.coordinates.isNullOrEmpty()) temp.coordinates else temp.name
+        searchBar.searchEditText.onEditorAction(EditorInfo.IME_ACTION_SEARCH)
+    }
+
     private fun showError(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
@@ -123,37 +138,24 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
             .subscribe { text -> listWeathersViewModel.onTextChanged(text) }
 
 
-        searchBar.setSuggestionsClickListener(object : SuggestionsAdapter.OnItemViewClickListener {
-            override fun OnItemDeleteListener(position: Int, v: View?) {
-                searchBar.lastSuggestions.removeAt(position)
-                searchBar.updateLastSuggestions(searchBar.lastSuggestions)
-            }
 
-            override fun OnItemClickListener(position: Int, v: View?) {
-                searchBar.disableSearch()
-                searchBar.text = searchBar.lastSuggestions[position].toString()
-                searchBar.searchEditText.onEditorAction(EditorInfo.IME_ACTION_SEARCH)
-            }
-        })
+
+
         searchBar.setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
             override fun onButtonClicked(buttonCode: Int) {
             }
 
             override fun onSearchStateChanged(enabled: Boolean) {
-                when(enabled){
-                    true -> recyclerView.visibility=View.GONE
-                    false -> recyclerView.visibility=View.VISIBLE
+                when (enabled) {
+                    true -> recyclerView.visibility = View.GONE
+                    false -> recyclerView.visibility = View.VISIBLE
                 }
 
             }
 
             override fun onSearchConfirmed(text: CharSequence?) {
-                searchBar.searchEditText.clearFocus()
-
-                if (!text.isNullOrEmpty()) {
-                    listWeathersViewModel.addNewLocation(text.toString())
-                }
-
+                searchBar.disableSearch()
+                listWeathersViewModel.addNewLocation(text.toString())
             }
         })
     }
