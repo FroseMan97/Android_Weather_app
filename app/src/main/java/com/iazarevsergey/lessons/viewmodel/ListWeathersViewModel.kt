@@ -64,8 +64,9 @@ class ListWeathersViewModel @Inject constructor(
         }
     }
 
-    fun getWeatherByPosition(position:Int): CurrentWeather{
-        return weathers.value?.get(position)!!
+    fun getFullWeatherRequestByPosition(position:Int): String{
+        val weather = weathers.value?.get(position)!!
+        return weather.location_name+","+weather.location_region+","+weather.location_country
     }
 
     private fun handleGetSearchesResult(result: GetSearchUsecase.Result) {

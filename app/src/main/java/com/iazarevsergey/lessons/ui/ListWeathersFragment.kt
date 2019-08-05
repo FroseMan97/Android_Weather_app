@@ -1,17 +1,16 @@
 package com.iazarevsergey.lessons.ui
 
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -28,8 +27,8 @@ import com.mancj.materialsearchbar.adapter.SuggestionsAdapter
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import kotlinx.android.synthetic.main.fragment_item.view.*
 import kotlinx.android.synthetic.main.fragment_list_weathers.*
+import java.lang.NullPointerException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -54,6 +53,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolBar.setupWithNavController(findNavController())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = WeatherAdapter(this)
         recyclerView.adapter = adapter
@@ -83,11 +83,13 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
     }
 
     override fun onItemClick(position: Int) {
-        val weather = listWeathersViewModel.getWeatherByPosition(position)
-        val selectedLocation = weather.location_name+","+weather.location_region+","+weather.location_country
-        Navigation.findNavController(searchBar).navigate(R.id.action_listWeathersFragment_to_detailWeatherFragment, bundleOf("selectedLocation" to selectedLocation))
-    }
+        Navigation.findNavController(searchBar)
+            .navigate(
+                R.id.action_listWeathersFragment_to_detailWeatherFragment,
+                bundleOf("selectedLocation" to listWeathersViewModel.getFullWeatherRequestByPosition(position))
+            )
 
+    }
     private fun showError(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
@@ -110,7 +112,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
                 }
 
                 override fun onTextChanged(string: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                        subscriber.onNext(string.toString())
+                    subscriber.onNext(string.toString())
                 }
             })
         })
@@ -119,6 +121,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
             .distinct()
             .filter { text -> text.isNotBlank() && text.length > 2 }
             .subscribe { text -> listWeathersViewModel.onTextChanged(text) }
+
 
         searchBar.setSuggestionsClickListener(object : SuggestionsAdapter.OnItemViewClickListener {
             override fun OnItemDeleteListener(position: Int, v: View?) {
@@ -137,6 +140,11 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener {
             }
 
             override fun onSearchStateChanged(enabled: Boolean) {
+                when(enabled){
+                    true -> recyclerView.visibility=View.GONE
+                    false -> recyclerView.visibility=View.VISIBLE
+                }
+
             }
 
             override fun onSearchConfirmed(text: CharSequence?) {

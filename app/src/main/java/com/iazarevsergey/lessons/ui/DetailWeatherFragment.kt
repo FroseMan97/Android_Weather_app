@@ -18,6 +18,7 @@ import com.iazarevsergey.lessons.viewmodel.DetailWeatherViewModel
 import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_detail_weather.*
+import kotlinx.android.synthetic.main.fragment_list_weathers.*
 import javax.inject.Inject
 
 class DetailWeatherFragment : Fragment() {

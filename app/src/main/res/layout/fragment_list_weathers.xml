@@ -14,32 +14,37 @@
     >
         <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
-
                 android:background="@color/colorPrimary"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
                 android:id="@+id/toolBar">
-            <com.mancj.materialsearchbar.MaterialSearchBar
-                    style="@style/MaterialSearchBarLight"
-                    app:mt_speechMode="false"
-                    app:mt_placeholder="@string/enter_location"
-                    android:id="@+id/searchBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"/>
-
-
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    <com.mancj.materialsearchbar.MaterialSearchBar
+            style="@style/MaterialSearchBarLight"
+            app:mt_speechMode="false"
+            app:mt_placeholder="@string/enter_location"
+            android:id="@+id/searchBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"/>
+
 
     <androidx.recyclerview.widget.RecyclerView
 
             android:layout_width="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:focusableInTouchMode="false"
+            android:isScrollContainer="false"
+
             android:layout_height="wrap_content"
             tools:listitem="@layout/fragment_item"
             android:id="@+id/recyclerView"
             android:layout_below="@+id/searchBar"/>
+    </RelativeLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
