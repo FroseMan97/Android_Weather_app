@@ -2,8 +2,6 @@ package com.iazarevsergey.lessons.ui
 
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +20,9 @@ import com.iazarevsergey.lessons.domain.model.Search
 import com.iazarevsergey.lessons.factory.ViewModelFactory
 import com.iazarevsergey.lessons.ui.adapter.CustomSuggestionsAdapter
 import com.iazarevsergey.lessons.ui.adapter.WeatherAdapter
+import com.iazarevsergey.lessons.ui.listener.SearchActionListener
+import com.iazarevsergey.lessons.ui.listener.SearchTextWatcher
 import com.iazarevsergey.lessons.viewmodel.ListWeathersViewModel
-import com.mancj.materialsearchbar.MaterialSearchBar
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
@@ -90,6 +89,11 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener,
         })
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        arguments?.clear()
+    }
+
     override fun onItemClick(position: Int) {
         Navigation.findNavController(searchBar)
             .navigate(
@@ -101,7 +105,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener,
 
     override fun OnItemClickListener(position: Int) {
         val temp = searchBar.lastSuggestions[position] as Search
-        searchBar.text = if (!temp.coordinates.isNullOrEmpty()) temp.coordinates else temp.name
+        searchBar.text = temp.toSearchFormat()
         searchBar.searchEditText.onEditorAction(EditorInfo.IME_ACTION_SEARCH)
     }
 
@@ -109,22 +113,10 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener,
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        arguments?.clear()
-    }
-
     private fun initSearchBarListeners() {
 
         Observable.create(ObservableOnSubscribe<String> { subscriber ->
-            searchBar.addTextChangeListener(object : TextWatcher {
-                private var searchFor = ""
-                override fun afterTextChanged(p0: Editable?) {
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
+            searchBar.addTextChangeListener(object : SearchTextWatcher {
 
                 override fun onTextChanged(string: CharSequence?, p1: Int, p2: Int, p3: Int) {
                     subscriber.onNext(string.toString())
@@ -137,22 +129,13 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnItemListener,
             .filter { text -> text.isNotBlank() && text.length > 2 }
             .subscribe { text -> listWeathersViewModel.onTextChanged(text) }
 
-
-
-
-
-        searchBar.setOnSearchActionListener(object : MaterialSearchBar.OnSearchActionListener {
-            override fun onButtonClicked(buttonCode: Int) {
-            }
-
+        searchBar.setOnSearchActionListener(object : SearchActionListener {
             override fun onSearchStateChanged(enabled: Boolean) {
                 when (enabled) {
                     true -> recyclerView.visibility = View.GONE
                     false -> recyclerView.visibility = View.VISIBLE
                 }
-
             }
-
             override fun onSearchConfirmed(text: CharSequence?) {
                 searchBar.disableSearch()
                 listWeathersViewModel.addNewLocation(text.toString())
