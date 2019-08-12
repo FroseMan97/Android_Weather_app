@@ -7,9 +7,8 @@
     <fragment android:id="@+id/listWeathersFragment" android:name="com.iazarevsergey.lessons.ui.ListWeathersFragment"
               android:label="@string/fragment_list_weathers" tools:layout="@layout/fragment_list_weathers">
         <action android:id="@+id/action_listWeathersFragment_to_detailWeatherFragment"
-                app:destination="@id/detailWeatherFragment" app:enterAnim="@anim/nav_default_enter_anim"
-                app:exitAnim="@anim/nav_default_exit_anim" app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-                app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
+                app:destination="@id/detailWeatherFragment"
+        />
     </fragment>
     <fragment android:id="@+id/detailWeatherFragment" android:name="com.iazarevsergey.lessons.ui.DetailWeatherFragment"
               android:label="@string/fragment_detail_weather" tools:layout="@layout/fragment_detail_weather">

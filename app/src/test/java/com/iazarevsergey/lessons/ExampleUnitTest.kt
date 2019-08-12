@@ -1,12 +1,8 @@
 package com.iazarevsergey.lessons
 
-import com.iazarevsergey.lessons.data.model.response.CurrentWeatherResponse
-import com.iazarevsergey.lessons.data.network.WeatherApi
 import org.junit.Test
 
 import org.junit.Assert.*
-import retrofit2.Response
-import javax.inject.Inject
 
 /**
  * Example local unit test, which will execute on the development machine (host).

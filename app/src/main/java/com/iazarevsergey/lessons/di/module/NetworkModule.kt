@@ -19,25 +19,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
-class DataModule {
-
-    @Provides
-    @Singleton
-    fun provdeGetWeatherUsecase(weatherRepository: WeatherRepository):GetWeatherUsecase{
-        return GetWeatherUsecase(weatherRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provdeGetSearchUsecase(weatherRepository: WeatherRepository): GetSearchUsecase {
-        return GetSearchUsecase(weatherRepository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideWeatherRepository(weatherApi: WeatherApi): IWeatherRepository {
-        return WeatherRepository(weatherApi)
-    }
+class NetworkModule {
 
     @Provides
     @Singleton
@@ -67,8 +49,8 @@ class DataModule {
     fun provideOkHttpClient(requestInterceptor:RequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(requestInterceptor)
-            .connectTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(1, TimeUnit.MINUTES)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

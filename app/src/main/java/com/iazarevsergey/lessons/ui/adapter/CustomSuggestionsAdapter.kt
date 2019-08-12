@@ -9,11 +9,15 @@ import com.iazarevsergey.lessons.domain.model.Search
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter
 import kotlinx.android.synthetic.main.suggestions_item.view.*
 
-class CustomSuggestionsAdapter(inflater: LayoutInflater, private val onItemViewClickListener: OnItemViewClickListener) : SuggestionsAdapter<Search, SuggestionHolder>(inflater)  {
+class CustomSuggestionsAdapter(inflater: LayoutInflater, private val onItemViewClickListener: OnItemViewClickListener) :
+    SuggestionsAdapter<Search, SuggestionHolder>(inflater) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SuggestionHolder {
-        return SuggestionHolder(LayoutInflater.from(parent.context).inflate(R.layout.suggestions_item, parent, false), onItemViewClickListener)
+        return SuggestionHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.suggestions_item, parent, false),
+            onItemViewClickListener
+        )
     }
 
     override fun getSingleViewHeight(): Int {
@@ -25,16 +29,18 @@ class CustomSuggestionsAdapter(inflater: LayoutInflater, private val onItemViewC
         holder.location_coordinates.text = suggestion.coordinates
     }
 
-    interface OnItemViewClickListener{
-        fun OnItemClickListener(position:Int)
+    interface OnItemViewClickListener {
+        fun OnItemClickListener(position: Int)
     }
 
 }
 
-class SuggestionHolder(itemView: View, OnItemViewClickListener:CustomSuggestionsAdapter.OnItemViewClickListener) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
+class SuggestionHolder(itemView: View, OnItemViewClickListener: CustomSuggestionsAdapter.OnItemViewClickListener) :
+    RecyclerView.ViewHolder(itemView), View.OnClickListener {
     val location_title = itemView.location_name
     val location_coordinates = itemView.location_coordinates
     val mOnItemViewClickListener: CustomSuggestionsAdapter.OnItemViewClickListener = OnItemViewClickListener
+
     init {
         itemView.setOnClickListener(this)
     }

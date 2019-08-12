@@ -1,5 +1,6 @@
 package com.iazarevsergey.lessons.data.model
 
+
 import com.google.gson.annotations.SerializedName
 
 

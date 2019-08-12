@@ -13,6 +13,8 @@
     <string name="speed_units_text">km/h</string>
     <string name="fragment_list_weathers">List of the locations</string>
     <string name="fragment_detail_weather">Detail weather</string>
+    <string name="internet_off">Internet off</string>
+    <string name="internet_on">Internet on</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

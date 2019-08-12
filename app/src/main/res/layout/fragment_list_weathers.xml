@@ -17,12 +17,12 @@
             android:layout_height="match_parent">
         <com.mancj.materialsearchbar.MaterialSearchBar
                 style="@style/MaterialSearchBarLight"
+                android:saveEnabled="false"
                 app:mt_speechMode="false"
                 app:mt_placeholder="@string/enter_location"
                 android:id="@+id/searchBar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0" android:layout_marginTop="8dp"
@@ -34,6 +34,7 @@
         <androidx.recyclerview.widget.RecyclerView
 
                 android:layout_width="0dp"
+                android:isScrollContainer="false"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/fragment_list_item"
                 android:id="@+id/recyclerView"

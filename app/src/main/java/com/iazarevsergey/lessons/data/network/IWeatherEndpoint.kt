@@ -1,9 +1,8 @@
 package com.iazarevsergey.lessons.data.network
 
-import com.iazarevsergey.lessons.data.model.response.CurrentWeatherResponse
+import com.iazarevsergey.lessons.data.model.response.WeatherResponse
 import com.iazarevsergey.lessons.data.model.response.SearchResponse
 import io.reactivex.Single
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -14,7 +13,7 @@ interface IWeatherEndpoint {
     fun getCurrentWeather(
         @Query("q") location: String,
         @Query("lang") language: String = "en"
-    ): Single<CurrentWeatherResponse>
+    ): Single<WeatherResponse>
 
 
     @GET("search.json")

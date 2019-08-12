@@ -12,10 +12,4 @@ data class SearchResponse (
     @SerializedName("lat") val lat : Double,
     @SerializedName("lon") val lon : Double,
     @SerializedName("url") val url : String
-):DomainMappable<Search>{
-    override fun asDomain(): Search = Search(
-        name,
-        "$lat,$lon"
-    )
-
-}
+)

@@ -13,4 +13,6 @@
     <string name="speed_units_text">км/ч</string>
     <string name="fragment_list_weathers">Список локаций</string>
     <string name="fragment_detail_weather">Детальная информация о погоде</string>
+    <string name="internet_off">Нет интернета</string>
+    <string name="internet_on">Интернет есть</string>
 </resources>

@@ -2,7 +2,6 @@ package com.iazarevsergey.lessons.ui
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.iazarevsergey.lessons.R
-import com.iazarevsergey.lessons.domain.model.CurrentWeather
+import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.factory.ViewModelFactory
 import com.iazarevsergey.lessons.viewmodel.DetailWeatherViewModel
 import com.squareup.picasso.Picasso
@@ -31,8 +30,9 @@ class DetailWeatherFragment : Fragment() {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
         detailWeatherViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailWeatherViewModel::class.java)
-        if(detailWeatherViewModel.getWeather().value == null){
-            detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation")!!)
+        if (detailWeatherViewModel.getWeather().value == null) {
+            val stringWithCoordinates = arguments?.getString("selectedLocation")!!
+            detailWeatherViewModel.getDetailWeather(stringWithCoordinates)
         }
     }
 
@@ -66,11 +66,12 @@ class DetailWeatherFragment : Fragment() {
     }
 
 
-    private fun setDataUI(currentWeather: CurrentWeather) {
+    private fun setDataUI(currentWeather: Weather) {
         city.text = currentWeather.location_name
         last_updated.text = getString(R.string.last_update_text) + " " + currentWeather.weather_last_updated
-        region.text =
-            getString(R.string.region_text) + " " + currentWeather.location_region + ", " + currentWeather.location_country
+        region_text.text =
+            "${currentWeather.location_region}"
+        country_text.text = "${currentWeather.location_country}"
         condition_text.text = currentWeather.condition_text
         temp_c.text = getString(R.string.temp_text) + " " + currentWeather.weather_temp_c + " °C"
         wind_kph.text =
@@ -93,7 +94,8 @@ class DetailWeatherFragment : Fragment() {
         val status = if (flag) View.VISIBLE else View.GONE
         city.visibility = status
         last_updated.visibility = status
-        region.visibility = status
+        region_text.visibility = status
+        country_text.visibility = status
         condition_text.visibility = status
         temp_c.visibility = status
         wind_kph.visibility = status

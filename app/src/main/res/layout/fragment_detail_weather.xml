@@ -12,7 +12,8 @@
             android:id="@+id/detailAppBarLayout"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+    >
         <androidx.appcompat.widget.Toolbar
                 android:layout_width="match_parent"
                 android:background="@color/colorPrimary"
@@ -26,14 +27,15 @@
     <TextView
             tools:text="@string/city_text"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
             android:id="@+id/city" android:textSize="24sp"
             android:foregroundGravity="center" android:gravity="center"
 
-            app:layout_constraintBottom_toTopOf="@+id/region" android:layout_marginBottom="12dp"
-            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            android:layout_marginStart="8dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="7dp"
+            app:layout_constraintBottom_toTopOf="@+id/region_text"/>
     <TextView
             tools:text="@string/temp_text"
             android:layout_width="wrap_content"
@@ -55,9 +57,9 @@
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/city"
-            android:visibility="visible"/>
+            app:layout_constraintHorizontal_bias="0.498"
+            android:visibility="visible" android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@+id/city"/>
     <TextView
             tools:text="@string/last_update_text"
             android:layout_width="wrap_content"
@@ -74,13 +76,13 @@
             tools:text="@string/region_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/region"
-
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-            app:layout_constraintHorizontal_bias="0.499" android:visibility="visible"
-            android:layout_marginBottom="32dp"
-            app:layout_constraintBottom_toTopOf="@+id/temp_c"/>
+            android:id="@+id/region_text"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:visibility="visible"
+            android:layout_marginBottom="7dp"
+            app:layout_constraintBottom_toTopOf="@+id/temp_c" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.5" app:layout_constraintEnd_toStartOf="@+id/country_text"
+            android:layout_marginStart="8dp"/>
     <TextView
             tools:text="@string/feelslike_text"
             android:layout_width="wrap_content"
@@ -106,8 +108,7 @@
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.499"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/condition_text"
             android:visibility="visible"
-            android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="@+id/detailAppBarLayout"
-            app:layout_constraintVertical_bias="1.0"/>
+    />
     <TextView
             tools:text="@string/wind_text"
             android:layout_width="wrap_content"
@@ -130,5 +131,14 @@
             android:layout_marginStart="8dp" android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone"/>
+    <TextView
+            tools:text="Country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/country_text"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp" app:layout_constraintStart_toEndOf="@+id/region_text"
+            android:layout_marginStart="8dp" app:layout_constraintBaseline_toBaselineOf="@+id/region_text"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

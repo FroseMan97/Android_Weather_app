@@ -3,13 +3,11 @@ package com.iazarevsergey.lessons
 import android.app.Activity
 import android.app.Application
 import com.iazarevsergey.lessons.di.component.DaggerApplicationComponent
-import com.iazarevsergey.lessons.di.module.AndroidModule
-import com.iazarevsergey.lessons.di.module.DataModule
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
 
-class App:Application(), HasActivityInjector {
+class App : Application(), HasActivityInjector {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
@@ -22,7 +20,6 @@ class App:Application(), HasActivityInjector {
         super.onCreate()
         DaggerApplicationComponent.builder()
             .application(this)
-            .dataModule(DataModule())
             .build()
             .inject(this)
     }
