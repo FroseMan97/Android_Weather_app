@@ -14,21 +14,20 @@ import androidx.navigation.ui.setupWithNavController
 import com.iazarevsergey.lessons.R
 import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.factory.ViewModelFactory
+import com.iazarevsergey.lessons.ui.base.BaseFragment
 import com.iazarevsergey.lessons.viewmodel.DetailWeatherViewModel
 import com.squareup.picasso.Picasso
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_detail_weather.*
 import javax.inject.Inject
 
-class DetailWeatherFragment : Fragment() {
+class DetailWeatherFragment : BaseFragment() {
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelFactory
+
     private lateinit var detailWeatherViewModel: DetailWeatherViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidSupportInjection.inject(this)
         detailWeatherViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailWeatherViewModel::class.java)
         detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation"))
 

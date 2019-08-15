@@ -6,9 +6,9 @@ import com.iazarevsergey.lessons.data.model.response.WeatherResponseMapper
 import com.iazarevsergey.lessons.domain.model.Search
 import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.domain.repository.IWeatherRepository
-import com.iazarevsergey.lessons.domain.repository.datasource.IConnectivityDatasource
-import com.iazarevsergey.lessons.domain.repository.datasource.ILocalDatasource
-import com.iazarevsergey.lessons.domain.repository.datasource.IRemoteDatasource
+import com.iazarevsergey.lessons.domain.datasource.IConnectivityDatasource
+import com.iazarevsergey.lessons.domain.datasource.ILocalDatasource
+import com.iazarevsergey.lessons.domain.datasource.IRemoteDatasource
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

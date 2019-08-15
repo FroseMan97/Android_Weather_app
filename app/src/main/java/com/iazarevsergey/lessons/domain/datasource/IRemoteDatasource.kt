@@ -1,4 +1,4 @@
-package com.iazarevsergey.lessons.domain.repository.datasource
+package com.iazarevsergey.lessons.domain.datasource
 
 import com.iazarevsergey.lessons.data.model.response.SearchResponse
 import com.iazarevsergey.lessons.data.model.response.WeatherResponse

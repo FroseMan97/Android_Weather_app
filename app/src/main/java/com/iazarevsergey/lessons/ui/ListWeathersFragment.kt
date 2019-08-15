@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,12 +19,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.iazarevsergey.lessons.R
 import com.iazarevsergey.lessons.domain.model.Search
 import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.factory.ViewModelFactory
 import com.iazarevsergey.lessons.ui.adapter.CustomSuggestionsAdapter
 import com.iazarevsergey.lessons.ui.adapter.WeatherAdapter
+import com.iazarevsergey.lessons.ui.base.BaseFragment
 import com.iazarevsergey.lessons.ui.listener.SearchActionListener
 import com.iazarevsergey.lessons.ui.listener.SearchTextWatcher
 import com.iazarevsergey.lessons.viewmodel.ListWeathersViewModel
@@ -35,11 +38,13 @@ import kotlinx.android.synthetic.main.fragment_list_weathers.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
+class ListWeathersFragment : BaseFragment(), WeatherAdapter.OnWeathersItemClick,
     CustomSuggestionsAdapter.OnItemViewClickListener {
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelFactory
+    //TODO error handling livedata
+    //TODO bundle при переходе в detail+в repository
+    //TODO dagger ActivityScope
+
     private lateinit var listWeathersViewModel: ListWeathersViewModel
     private val compositeDisposable = CompositeDisposable()
     private val adapter = WeatherAdapter(this)
@@ -50,7 +55,6 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
         if (savedInstanceState != null) {
             isFirstSession = savedInstanceState.getBoolean("isFirstSession")
         }
-        AndroidSupportInjection.inject(this)
         listWeathersViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListWeathersViewModel::class.java)
     }
 
@@ -111,7 +115,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
 
         listWeathersViewModel.getInfo().observe(this, Observer {
             if (it != null)
-                showInfo(it)
+                showToastInfo(it)
         })
 
         listWeathersViewModel.getSearches().observe(this, Observer {
@@ -122,6 +126,20 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
             refreshList.isRefreshing = it
         })
 
+        listWeathersViewModel.getNetworkStatusChanged().observe(this, Observer {
+            when (it) {
+                true -> showSnackInfo(getString(R.string.internet_on), getColor(context!!, R.color.greenPrimary))
+                false -> showSnackInfo(getString(R.string.internet_off), getColor(context!!, R.color.redPrimary))
+            }
+
+        })
+
+    }
+
+    private fun showSnackInfo(message: String, color: Int) {
+        val snack = Snackbar.make(searchBar, message, Snackbar.LENGTH_LONG)
+        snack.view.setBackgroundColor(color)
+        snack.show()
     }
 
     private fun updateSuggestions(items: List<Search>) {
@@ -184,7 +202,7 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
     }
 
 
-    private fun showInfo(message: String) {
+    private fun showToastInfo(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 

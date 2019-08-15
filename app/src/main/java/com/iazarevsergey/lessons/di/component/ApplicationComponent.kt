@@ -4,13 +4,24 @@ import android.app.Application
 import com.iazarevsergey.lessons.App
 import com.iazarevsergey.lessons.di.module.*
 import com.iazarevsergey.lessons.di.module.ViewModelModule
+import com.iazarevsergey.lessons.ui.MainActivity
 import dagger.BindsInstance
 import dagger.Component
+import dagger.android.ContributesAndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ViewModelModule::class, NetworkModule::class, AndroidSupportInjectionModule::class, ActivityModule::class, FragmentModule::class, RepositoryModule::class, DbModule::class, AndroidModule::class])
+@Component(modules = [
+    AndroidSupportInjectionModule::class,
+    ActivityModule::class,
+    ViewModelModule::class,
+    NetworkModule::class,
+    RepositoryModule::class,
+    DbModule::class,
+    AndroidModule::class,
+    DatasourceModule::class
+])
 interface ApplicationComponent {
     @Component.Builder
     interface Builder {

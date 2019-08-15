@@ -1,20 +1,21 @@
-package com.iazarevsergey.lessons.data.repository.datasource
+package com.iazarevsergey.lessons.data.datasource
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import com.iazarevsergey.lessons.domain.repository.datasource.IConnectivityDatasource
+import android.util.Log
+import com.iazarevsergey.lessons.domain.datasource.IConnectivityDatasource
 import javax.inject.Inject
 
 class ConnectivityDatasource @Inject constructor(
     private val context: Context
 ) : IConnectivityDatasource {
 
-    private val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
     override fun isNetworkOn(): Boolean {
         var result = false
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cm?.run {
                 cm.getNetworkCapabilities(cm.activeNetwork)?.run {

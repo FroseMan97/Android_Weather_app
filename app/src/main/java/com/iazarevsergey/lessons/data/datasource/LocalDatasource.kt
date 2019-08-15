@@ -1,8 +1,8 @@
-package com.iazarevsergey.lessons.data.repository.datasource
+package com.iazarevsergey.lessons.data.datasource
 
 import com.iazarevsergey.lessons.data.db.WeatherDatabase
 import com.iazarevsergey.lessons.data.model.response.WeatherResponse
-import com.iazarevsergey.lessons.domain.repository.datasource.ILocalDatasource
+import com.iazarevsergey.lessons.domain.datasource.ILocalDatasource
 import io.reactivex.Completable
 import io.reactivex.Observable
 import javax.inject.Inject
