@@ -4,13 +4,8 @@ import com.iazarevsergey.lessons.AppConstants.Companion.WEATHER_BASE_URL
 import com.iazarevsergey.lessons.data.network.IWeatherEndpoint
 import com.iazarevsergey.lessons.data.network.WeatherApi
 import com.iazarevsergey.lessons.data.network.RequestInterceptor
-import com.iazarevsergey.lessons.data.repository.WeatherRepository
-import com.iazarevsergey.lessons.domain.repository.IWeatherRepository
-import com.iazarevsergey.lessons.domain.usecase.GetSearchUsecase
-import com.iazarevsergey.lessons.domain.usecase.GetWeatherUsecase
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

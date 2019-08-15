@@ -2,7 +2,6 @@ package com.iazarevsergey.lessons.ui
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +19,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.iazarevsergey.lessons.R
-import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.domain.model.Search
+import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.factory.ViewModelFactory
 import com.iazarevsergey.lessons.ui.adapter.CustomSuggestionsAdapter
 import com.iazarevsergey.lessons.ui.adapter.WeatherAdapter
@@ -42,11 +41,15 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
     @Inject
     internal lateinit var viewModelFactory: ViewModelFactory
     private lateinit var listWeathersViewModel: ListWeathersViewModel
-    private val compositeDisposable=CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
     private val adapter = WeatherAdapter(this)
+    private var isFirstSession = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            isFirstSession = savedInstanceState.getBoolean("isFirstSession")
+        }
         AndroidSupportInjection.inject(this)
         listWeathersViewModel = ViewModelProviders.of(this, viewModelFactory).get(ListWeathersViewModel::class.java)
     }
@@ -60,14 +63,20 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         toolBar.setupWithNavController(findNavController())
 
         initSearchBar()
         initRecyclerView()
+        initRefreshListener()
         initObservers()
 
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("isFirstSession", isFirstSession)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -78,36 +87,59 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
 
     // --------------------------------------------------------------------------------------------------
 
-    private fun initObservers(){
+    private fun initRefreshListener() {
+        refreshList.setOnRefreshListener {
+            listWeathersViewModel.updateAllWeather()
+        }
+    }
+
+    private fun initObservers() {
         listWeathersViewModel.getWeathers().observe(this, Observer {
-            if (it != null)
-                adapter.setNewItems(it)
+            adapter.setNewItems(it)
+            if (it.isEmpty()) {
+                empty_list_text.visibility = View.VISIBLE
+                refreshList.visibility = View.GONE
+            } else {
+                if (isFirstSession) {
+                    listWeathersViewModel.updateAllWeather()
+                    isFirstSession = false
+                }
+                empty_list_text.visibility = View.GONE
+                refreshList.visibility = View.VISIBLE
+            }
         })
 
-        listWeathersViewModel.getOnError().observe(this, Observer {
+        listWeathersViewModel.getInfo().observe(this, Observer {
             if (it != null)
-                showError(it)
+                showInfo(it)
         })
-
 
         listWeathersViewModel.getSearches().observe(this, Observer {
-            if (searchBar.isSearchEnabled) {
-                searchBar.updateLastSuggestions(it)
-            } else {
-                searchBar.lastSuggestions = it
-            }
+            updateSuggestions(it)
+        })
+
+        listWeathersViewModel.getIsRefreshing().observe(this, Observer {
+            refreshList.isRefreshing = it
         })
 
     }
 
-    private fun initSearchBar(){
+    private fun updateSuggestions(items: List<Search>) {
+        if (searchBar.isSearchEnabled) {
+            searchBar.updateLastSuggestions(items)
+        } else {
+            searchBar.lastSuggestions = items
+        }
+    }
+
+    private fun initSearchBar() {
         val inflater = LayoutInflater.from(this.context)
         val customSuggestionsAdapter = CustomSuggestionsAdapter(inflater, this)
         searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter)
         initSearchBarListeners()
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         recyclerView.adapter = adapter
@@ -117,12 +149,16 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
 
     private fun initSwipeToDelete() {
         ItemTouchHelper(object : ItemTouchHelper.Callback() {
-            override fun getMovementFlags(recyclerView: RecyclerView,
-                                          viewHolder: RecyclerView.ViewHolder): Int =
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int =
                 makeMovementFlags(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
 
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
-                                target: RecyclerView.ViewHolder): Boolean = false
+            override fun onMove(
+                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 listWeathersViewModel.deleteWeather(adapter.items[viewHolder.adapterPosition])
@@ -148,13 +184,13 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
     }
 
 
-    private fun showError(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    private fun showInfo(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun initSearchBarListeners() {
 
-       compositeDisposable.add(Observable.create(ObservableOnSubscribe<String> { subscriber ->
+        compositeDisposable.add(Observable.create(ObservableOnSubscribe<String> { subscriber ->
             searchBar.addTextChangeListener(object : SearchTextWatcher {
 
                 override fun onTextChanged(string: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -171,8 +207,14 @@ class ListWeathersFragment : Fragment(), WeatherAdapter.OnWeathersItemClick,
         searchBar.setOnSearchActionListener(object : SearchActionListener {
             override fun onSearchStateChanged(enabled: Boolean) {
                 when (enabled) {
-                    true -> recyclerView.visibility = View.GONE
-                    false -> recyclerView.visibility = View.VISIBLE
+                    true -> {
+                        recyclerView.visibility = View.GONE
+
+                    }
+                    false -> {
+                        recyclerView.visibility = View.VISIBLE
+
+                    }
                 }
             }
 

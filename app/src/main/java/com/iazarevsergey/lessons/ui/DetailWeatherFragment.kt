@@ -30,10 +30,8 @@ class DetailWeatherFragment : Fragment() {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
         detailWeatherViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailWeatherViewModel::class.java)
-        if (detailWeatherViewModel.getWeather().value == null) {
-            val stringWithCoordinates = arguments?.getString("selectedLocation")!!
-            detailWeatherViewModel.getDetailWeather(stringWithCoordinates)
-        }
+        detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation"))
+
     }
 
     override fun onCreateView(
@@ -46,6 +44,11 @@ class DetailWeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         detailToolBar.setupWithNavController(findNavController())
+
+        update_button.setOnClickListener {
+            detailWeatherViewModel.updateWeather()
+        }
+
         detailWeatherViewModel.getWeather().observe(this, Observer {
             if (it == null) {
                 setVisibilityUI(false)
@@ -57,10 +60,12 @@ class DetailWeatherFragment : Fragment() {
 
         detailWeatherViewModel.getIsLoading().observe(this, Observer {
             setLoading(it)
+            setVisibilityUI(!it)
         })
 
-        detailWeatherViewModel.getOnError().observe(this, Observer {
-            showError(it)
+        detailWeatherViewModel.getInfo().observe(this, Observer {
+            if (!it.isNullOrEmpty())
+                showInfo(it)
         })
 
     }
@@ -86,12 +91,13 @@ class DetailWeatherFragment : Fragment() {
 
     }
 
-    private fun showError(message: String) {
+    private fun showInfo(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun setVisibilityUI(flag: Boolean) {
         val status = if (flag) View.VISIBLE else View.GONE
+        update_button.visibility = status
         city.visibility = status
         last_updated.visibility = status
         region_text.visibility = status

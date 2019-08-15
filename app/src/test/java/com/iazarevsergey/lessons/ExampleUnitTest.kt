@@ -1,5 +1,10 @@
 package com.iazarevsergey.lessons
 
+import android.util.Log
+import io.reactivex.Scheduler
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
+import io.reactivex.schedulers.Schedulers
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -17,3 +22,4 @@ class ExampleUnitTest {
     }
 
 }
+

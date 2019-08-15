@@ -1,50 +1,81 @@
 package com.iazarevsergey.lessons.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.iazarevsergey.lessons.data.model.response.*
-import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.domain.model.Search
+import com.iazarevsergey.lessons.domain.model.Weather
 import com.iazarevsergey.lessons.domain.usecase.*
 import com.iazarevsergey.lessons.util.Result
 import com.iazarevsergey.lessons.util.ResultType
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ListWeathersViewModel @Inject constructor(
-    private val getSearchUsecase: GetSearchUsecase,
+    private val getSearchUsecase: GetSearchesUsecase,
     private val getUserWeatherUsecase: GetUserWeatherListUsecase,
     private val addWeatherUsecase: AddWeatherUsecase,
-    private val deleteWeatherUsecase: DeleteWeatherUsecase
+    private val deleteWeatherUsecase: DeleteWeatherUsecase,
+    private val updateAllWeatherUsecase: UpdateAllWeatherUsecase
 ) : ViewModel() {
 
     private val weathers = MutableLiveData<List<Weather>>()
-    private var onError = MutableLiveData<String>()
+    private var info = MutableLiveData<String>()
     private var searches = MutableLiveData<List<Search>>()
-
+    private var isRefreshing = MutableLiveData<Boolean>()
     private val compositeDisposable = CompositeDisposable()
 
     init {
-        weathers.value = ArrayList<Weather>()
+        weathers.value = ArrayList()
         getUserWeatherList()
     }
 
     fun getSearches(): LiveData<List<Search>> = searches
     fun getWeathers(): LiveData<List<Weather>> = weathers
-    fun getOnError(): LiveData<String> = onError
+    fun getInfo(): LiveData<String> = info
+    fun getIsRefreshing(): LiveData<Boolean> = isRefreshing
 
-    fun addWeather(location:String) {
-            compositeDisposable.add(
-                addWeatherUsecase.execute(location)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe { handleAddWeatherResult(it) }
-            )
+    fun addWeather(location: String) {
+        compositeDisposable.add(
+            addWeatherUsecase.execute(location)
+                .timeout(5, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .subscribe({ info.postValue("Элемент добавлен") }, { e -> info.postValue(e.message) })
+        )
     }
 
-    fun getUserWeatherList(){
+    fun deleteWeather(item: Weather) {
+        compositeDisposable.add(
+            deleteWeatherUsecase.execute(item)
+                .subscribeOn(Schedulers.io())
+                .subscribe({ info.postValue("Элемент удален") }, { e -> info.postValue(e.message) })
+        )
+    }
+
+    fun updateAllWeather() {
+        if (!weathers.value.isNullOrEmpty()) {
+            isRefreshing.postValue(true)
+            compositeDisposable.add(
+                updateAllWeatherUsecase.execute(weathers.value!!)
+                    .timeout(5, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                        {
+                            info.postValue("Вся погода обновлена")
+                            isRefreshing.postValue(false)
+                        },
+                        { error ->
+                            info.postValue(error.toString())
+                            isRefreshing.postValue(false)
+                        }
+                    )
+            )
+        }
+    }
+
+    private fun getUserWeatherList() {
         compositeDisposable.add(
             getUserWeatherUsecase.execute()
                 .subscribeOn(Schedulers.io())
@@ -52,41 +83,16 @@ class ListWeathersViewModel @Inject constructor(
         )
     }
 
-    private fun handleGetUserWeatherListResult(result:Result<List<Weather>>){
+    private fun handleGetUserWeatherListResult(result: Result<List<Weather>>) {
 
-        when(result.resultType){
-            ResultType.SUCCESS ->{
-                weathers.postValue(result.data)
-            }
-            ResultType.ERROR ->{
-                onError.postValue(result.message)
-            }
-        }
-    }
-
-    private fun handleAddWeatherResult(result: Result<Weather>) {
         when (result.resultType) {
             ResultType.SUCCESS -> {
-                if(!weathers.value!!.contains(result.data!!)) {
-                    val arrayList = ArrayList(weathers.value!!)
-                    arrayList.add(result.data)
-                    weathers.postValue(arrayList)
-                }else{
-                    onError.postValue("Такой элемент уже существует")
-                }
+                weathers.postValue(result.data)
             }
             ResultType.ERROR -> {
-                onError.postValue(result.message)
+                info.postValue(result.message)
             }
         }
-    }
-
-    fun deleteWeather(item: Weather){
-        compositeDisposable.add(
-            deleteWeatherUsecase.execute(WeatherResponseMapper.mapTo(item))
-                .subscribeOn(Schedulers.io())
-                .subscribe()
-        )
     }
 
     fun onTextChanged(searchLocation: String) {
@@ -103,7 +109,7 @@ class ListWeathersViewModel @Inject constructor(
         when (weathers.value!!.contains(item)) {
             true -> return "${item.location_lat},${item.location_lon}"
         }
-        onError.postValue("Элемент не найден")
+        info.postValue("Элемент не найден")
         return null
     }
 
@@ -113,11 +119,12 @@ class ListWeathersViewModel @Inject constructor(
                 searches.postValue(result.data!!)
             }
             ResultType.ERROR -> {
-                onError.postValue(result.message)
+                info.postValue(result.message)
+                info.postValue(null)
             }
         }
-
     }
+
 
     override fun onCleared() {
         compositeDisposable.dispose()

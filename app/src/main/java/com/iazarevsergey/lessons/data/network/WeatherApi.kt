@@ -1,7 +1,7 @@
 package com.iazarevsergey.lessons.data.network
 
-import com.iazarevsergey.lessons.data.model.response.WeatherResponse
 import com.iazarevsergey.lessons.data.model.response.SearchResponse
+import com.iazarevsergey.lessons.data.model.response.WeatherResponse
 import io.reactivex.Single
 import javax.inject.Inject
 

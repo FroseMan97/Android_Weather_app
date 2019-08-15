@@ -15,7 +15,8 @@
     <string name="fragment_detail_weather">Detail weather</string>
     <string name="internet_off">Internet off</string>
     <string name="internet_on">Internet on</string>
-
+    <string name="empty_list">List is empty</string>
+    <string name="update_text">Update</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

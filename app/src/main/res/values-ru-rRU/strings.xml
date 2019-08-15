@@ -15,4 +15,6 @@
     <string name="fragment_detail_weather">Детальная информация о погоде</string>
     <string name="internet_off">Нет интернета</string>
     <string name="internet_on">Интернет есть</string>
+    <string name="empty_list">Список пуст</string>
+    <string name="update_text">Обновить</string>
 </resources>
