@@ -29,7 +29,7 @@ class DetailWeatherFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         detailWeatherViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailWeatherViewModel::class.java)
-        detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation"))
+        detailWeatherViewModel.getDetailWeather(arguments?.getString("selectedLocation")) //TODO лучше через даггер передать
 
     }
 
