@@ -1,6 +1,5 @@
 package com.iazarevsergey.lessons.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,6 @@ import com.iazarevsergey.lessons.domain.usecase.*
 import com.iazarevsergey.lessons.util.Result
 import com.iazarevsergey.lessons.util.ResultType
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -20,8 +18,7 @@ class ListWeathersViewModel @Inject constructor(
     private val getUserWeatherUsecase: GetUserWeatherListUsecase,
     private val addWeatherUsecase: AddWeatherUsecase,
     private val deleteWeatherUsecase: DeleteWeatherUsecase,
-    private val updateAllWeatherUsecase: UpdateAllWeatherUsecase,
-    private val reactToNetworkStatusChangeUsecase: ReactToNetworkStatusChangeUsecase
+    private val updateAllWeatherUsecase: UpdateAllWeatherUsecase
 ) : ViewModel() {
 
     private val weathers = MutableLiveData<List<Weather>>()
@@ -34,22 +31,14 @@ class ListWeathersViewModel @Inject constructor(
     init {
         weathers.value = ArrayList()
         getUserWeatherList()
-        reactToNetworkStatusChange()
     }
 
     fun getSearches(): LiveData<List<Search>> = searches
     fun getWeathers(): LiveData<List<Weather>> = weathers
     fun getInfo(): LiveData<String> = info
     fun getIsRefreshing(): LiveData<Boolean> = isRefreshing
-    fun getNetworkStatusChanged():LiveData<Boolean> = networkStatusChanged
+    fun getNetworkStatusChanged(): LiveData<Boolean> = networkStatusChanged
 
-    fun reactToNetworkStatusChange(){
-        compositeDisposable.add(
-            reactToNetworkStatusChangeUsecase.execute()
-                .subscribeOn(Schedulers.io())
-                .subscribe { networkStatusChanged.postValue(it) } //TODO error handling
-        )
-    }
 
     fun addWeather(location: String) {
         compositeDisposable.add(
@@ -90,7 +79,6 @@ class ListWeathersViewModel @Inject constructor(
     }
 
 
-
     private fun getUserWeatherList() {
         compositeDisposable.add(
             getUserWeatherUsecase.execute()
@@ -121,9 +109,9 @@ class ListWeathersViewModel @Inject constructor(
         }
     }
 
-    fun getWeatherCoordinates(item: Weather): String? {
-        when (weathers.value!!.contains(item)) {
-            true -> return "${item.location_lat},${item.location_lon}"
+    fun isContainsWeatherCoordinates(item: Weather): String? {
+        if (weathers.value!!.contains(item)) {
+            return "${item.location_lat},${item.location_lon}"
         }
         info.postValue("Элемент не найден")
         return null

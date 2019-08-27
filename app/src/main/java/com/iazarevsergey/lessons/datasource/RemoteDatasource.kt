@@ -1,9 +1,9 @@
-package com.iazarevsergey.lessons.data.datasource
+package com.iazarevsergey.lessons.datasource
 
 import com.iazarevsergey.lessons.data.model.response.SearchResponse
 import com.iazarevsergey.lessons.data.model.response.WeatherResponse
 import com.iazarevsergey.lessons.data.network.WeatherApi
-import com.iazarevsergey.lessons.domain.datasource.IRemoteDatasource
+import com.iazarevsergey.lessons.data.datasource.IRemoteDatasource
 import io.reactivex.Single
 import java.util.*
 import javax.inject.Inject

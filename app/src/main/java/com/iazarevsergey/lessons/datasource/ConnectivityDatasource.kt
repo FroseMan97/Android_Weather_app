@@ -1,11 +1,10 @@
-package com.iazarevsergey.lessons.data.datasource
+package com.iazarevsergey.lessons.datasource
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
-import android.util.Log
-import com.iazarevsergey.lessons.domain.datasource.IConnectivityDatasource
+import com.iazarevsergey.lessons.data.datasource.IConnectivityDatasource
 import javax.inject.Inject
 
 class ConnectivityDatasource @Inject constructor(

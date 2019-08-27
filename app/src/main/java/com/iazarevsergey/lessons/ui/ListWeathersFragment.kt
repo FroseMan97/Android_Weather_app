@@ -185,7 +185,7 @@ class ListWeathersFragment : BaseFragment(), WeatherAdapter.OnWeathersItemClick,
     }
 
     override fun onItemClick(item: Weather) {
-        val coordinates = listWeathersViewModel.getWeatherCoordinates(item)
+        val coordinates = listWeathersViewModel.isContainsWeatherCoordinates(item)
         if (coordinates != null) {
             Navigation.findNavController(searchBar)
                 .navigate(
